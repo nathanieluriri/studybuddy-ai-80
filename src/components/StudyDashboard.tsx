@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { NotesGrid } from './NotesGrid';
@@ -11,7 +11,8 @@ import {
   Brain, 
   MessageSquare, 
   BookOpen,
-  ArrowLeft
+  ArrowLeft,
+  TrendingUp
 } from 'lucide-react';
 import { Note } from '@/types';
 import { apiClient } from '@/lib/api';
@@ -28,7 +29,28 @@ export function StudyDashboard({ onLogout }: StudyDashboardProps) {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [stats, setStats] = useState({ totalNotes: 0, quizzesTaken: 0, conversations: 0 });
   const { toast } = useToast();
+
+  useEffect(() => {
+    loadStats();
+  }, [refreshKey]);
+
+  const loadStats = async () => {
+    try {
+      // Load actual notes count from API
+      const notesResponse = await apiClient.getNotes();
+      const notes = Array.isArray(notesResponse) ? notesResponse : (notesResponse as any).notes || [];
+      
+      setStats({
+        totalNotes: notes.length,
+        quizzesTaken: 0, // This would come from a dedicated stats endpoint
+        conversations: 0, // This would come from a dedicated stats endpoint
+      });
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  };
 
   const handleNoteSelect = (note: Note) => {
     setSelectedNote(note);
@@ -47,6 +69,7 @@ export function StudyDashboard({ onLogout }: StudyDashboardProps) {
   const handleBackToDashboard = () => {
     setViewMode('dashboard');
     setSelectedNote(null);
+    setRefreshKey(prev => prev + 1); // Refresh stats when returning
   };
 
   const handleUploadSuccess = () => {
@@ -149,35 +172,36 @@ export function StudyDashboard({ onLogout }: StudyDashboardProps) {
                   <BookOpen className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">12</div>
+                  <div className="text-2xl font-bold">{stats.totalNotes}</div>
                   <p className="text-xs text-muted-foreground">
-                    +2 from last week
+                    <TrendingUp className="h-3 w-3 inline mr-1" />
+                    Ready for learning
                   </p>
                 </CardContent>
               </Card>
               
               <Card className="shadow-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Quizzes Taken</CardTitle>
-                  <Brain className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">45</div>
-                  <p className="text-xs text-muted-foreground">
-                    +12 from last week
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="shadow-card">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">AI Conversations</CardTitle>
+                  <CardTitle className="text-sm font-medium">AI Chats</CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">28</div>
+                  <div className="text-2xl font-bold">{stats.conversations}</div>
                   <p className="text-xs text-muted-foreground">
-                    +5 from last week
+                    Get instant answers
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-card">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Quizzes Generated</CardTitle>
+                  <Brain className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.quizzesTaken}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Test your knowledge
                   </p>
                 </CardContent>
               </Card>

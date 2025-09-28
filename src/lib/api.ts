@@ -58,27 +58,27 @@ export class LearnWithAIClient {
 
   // Auth methods
   async register(email: string, password: string, name: string) {
-    const response = await this.request<{ token: string; user: any }>(
+    const response = await this.request<{ message: string; data: { token: string; name: string } }>(
       API_ENDPOINTS.auth.register,
       {
         method: 'POST',
         body: JSON.stringify({ email, password, name }),
       }
     );
-    this.token = response.token;
+    this.token = response.data.token;
     localStorage.setItem('authToken', this.token);
     return response;
   }
 
   async login(email: string, password: string) {
-    const response = await this.request<{ token: string; user: any }>(
+    const response = await this.request<{ message: string; data: { token: string; name: string } }>(
       API_ENDPOINTS.auth.login,
       {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       }
     );
-    this.token = response.token;
+    this.token = response.data.token;
     localStorage.setItem('authToken', this.token);
     return response;
   }

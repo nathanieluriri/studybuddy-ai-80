@@ -9,13 +9,14 @@ export interface User {
 
 export interface Note {
   id: string;
-  title: string;
-  filename: string;
+  note_name: string;
+  title?: string;
+  filename?: string;
   summary?: string;
   content?: string;
-  uploadedAt: string;
-  fileSize: number;
-  fileType: string;
+  uploadedAt?: string;
+  fileSize?: number;
+  fileType?: string;
 }
 
 export interface Question {

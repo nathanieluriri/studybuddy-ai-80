@@ -38,12 +38,10 @@ export function StudyDashboard({ onLogout }: StudyDashboardProps) {
 
   const loadStats = async () => {
     try {
-      // Load actual notes count from API
-      const notesResponse = await apiClient.getNotes();
-      const notes = Array.isArray(notesResponse) ? notesResponse : (notesResponse as any).notes || [];
+      const notes = await apiClient.getNotes();
       
       setStats({
-        totalNotes: notes.length,
+        totalNotes: notes?.length || 0,
         quizzesTaken: 0, // This would come from a dedicated stats endpoint
         conversations: 0, // This would come from a dedicated stats endpoint
       });

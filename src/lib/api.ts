@@ -109,7 +109,8 @@ export class LearnWithAIClient {
   }
 
   async getNotes() {
-    return this.request(API_ENDPOINTS.notes.list);
+    const response = await this.request<{ message: string; data: { notes: any[] } }>(API_ENDPOINTS.notes.list);
+    return response.data.notes;
   }
 
   async getNote(id: string) {

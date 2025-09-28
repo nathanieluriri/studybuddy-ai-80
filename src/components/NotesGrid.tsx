@@ -31,8 +31,8 @@ export function NotesGrid({ onNoteSelect, onUploadClick }: NotesGridProps) {
 
   const loadNotes = async () => {
     try {
-      const response = await apiClient.getNotes();
-      setNotes(Array.isArray(response) ? response : (response as any).notes || []);
+      const notes = await apiClient.getNotes();
+      setNotes(notes || []);
     } catch (error) {
       toast({
         title: 'Failed to load notes',
@@ -157,7 +157,7 @@ export function NotesGrid({ onNoteSelect, onUploadClick }: NotesGridProps) {
                   </Button>
                 </div>
                 <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
-                  {note.title || note.filename}
+                  {note.title || note.filename || note.note_name}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -170,9 +170,9 @@ export function NotesGrid({ onNoteSelect, onUploadClick }: NotesGridProps) {
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <Calendar className="h-3 w-3" />
-                    <span>{formatDate(note.uploadedAt)}</span>
+                    <span>{note.uploadedAt ? formatDate(note.uploadedAt) : 'Recently uploaded'}</span>
                   </div>
-                  <span>{formatFileSize(note.fileSize)}</span>
+                  {note.fileSize && <span>{formatFileSize(note.fileSize)}</span>}
                 </div>
                 
                 <div className="flex space-x-2 pt-2">
